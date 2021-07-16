@@ -1,0 +1,35 @@
+### GET ALL
+GET http://localhost:8080/api/projects
+
+### GET
+GET http://localhost:8080/api/projects/111
+
+### GET BY CODE
+GET http://localhost:8080/api/projects/search?code=PR003
+
+### SAVE
+POST http://localhost:8080/api/projects
+Content-Type: application/json
+
+{
+  "project_code": "PR08",
+  "project_name": "Project-8",
+  "project_details": "PM System Demo Project-8",
+  "manager_id": 6
+}
+
+### UPDATE
+PUT http://localhost:8080/api/projects
+Content-Type: application/json
+
+{
+  "project_id": 11,
+  "project_code": "PR07",
+  "project_name": "Project-7",
+  "project_details": "PM System Demo Project-7",
+  "manager_id": 6
+}
+
+### DELETE
+DELETE http://localhost:8080/api/projects/12
+

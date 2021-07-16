@@ -1,0 +1,82 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col-1">
+      <button mat-stroked-button class="bg-dark text-light" (click)="openModal(templateInsert)">
+        INSERT
+      </button>
+    </div>
+
+    <div class="col-10">
+      <div class="input-group w-50 mx-auto">
+        <input #searchInput type="text" class="form-control" placeholder="Enter staff name or email"
+               (keyup.enter)="navigateUrlForSearch(searchInput.value)">
+        <button class="btn btn-dark input-group-append" (click)="navigateUrlForSearch(searchInput.value)">SEARCH</button>
+      </div>
+    </div>
+
+    <div class="col-1">
+      <button mat-button (click)="clearSearch()">
+        <mat-icon>clear_all</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <ngx-datatable class="bootstrap shadow-sm"
+                 [rows]="staffList"
+                 [columnMode]="columnMode.flex"
+                 [rowHeight]="'auto'"
+                 [headerHeight]="50"
+                 [footerHeight]="50"
+                 [externalPaging]="true"
+                 [count]="pageable.totalElements"
+                 [offset]="pageable.page"
+                 [limit]="pageable.size"
+                 (page)="setPage($event)">
+    <ngx-datatable-column prop="name" name="NAME" [cellTemplate]="templateTitleCase"
+                          [flexGrow]="1" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="email" name="EMAIL" [cellTemplate]="templateEmail"
+                          [flexGrow]="1" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="position" name="POSITION" [cellTemplate]="templatePosition"
+                          [flexGrow]="1" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="username" name="ACCOUNT USERNAME" [cellTemplate]="templateUsername"
+                          [flexGrow]="1"></ngx-datatable-column>
+    <ngx-datatable-column prop="role" name="ACCOUNT ROLE" [cellTemplate]="templateRole"
+                          [flexGrow]="1"></ngx-datatable-column>
+    <ngx-datatable-column prop="id" name="DETAIL" [cellTemplate]="templateAction"
+                          [flexGrow]="0.5"></ngx-datatable-column>
+  </ngx-datatable>
+
+  <ng-template #templateTitleCase let-value="value">
+    <span *ngIf="value">{{value | titlecase}}</span>
+  </ng-template>
+
+  <ng-template #templatePosition let-value="value">
+    <span *ngIf="value === 'PROJECT_MANAGER'" class="badge badge-light text-info">PROJECT MANAGER</span>
+    <span *ngIf="value === 'TEAM_LEADER'" class="badge badge-light text-dark">TEAM LEADER</span>
+    <span *ngIf="value === 'ENGINEER'" class="badge badge-light text-muted">SOFTWARE ENGINEER</span>
+  </ng-template>
+
+  <ng-template #templateUsername let-value="value">
+    <span *ngIf="value">{{value}}</span>
+    <button mat-stroked-button *ngIf="!value" color="primary" type="button">Create Account</button>
+  </ng-template>
+
+  <ng-template #templateRole let-value="value">
+    <span *ngIf="value === 'ROLE_ADMIN'" class="badge badge-pill badge-info">ADMIN</span>
+    <span *ngIf="value === 'ROLE_USER'" class="badge badge-pill badge-secondary">USER</span>
+    <span *ngIf="!value">---</span>
+  </ng-template>
+
+  <ng-template #templateEmail let-value="value">
+    <a *ngIf="value" role="button" class="text-primary" href="mailto: {{value}}"><{{value | lowercase}}></a>
+    <span *ngIf="!value" class="text-danger">---</span>
+  </ng-template>
+
+  <ng-template #templateAction let-value="value">
+    <button mat-stroked-button type="button" [routerLink]="value">Detail</button>
+  </ng-template>
+</div>
+
+<ng-template #templateInsert>
+
+</ng-template>

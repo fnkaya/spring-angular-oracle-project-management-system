@@ -1,0 +1,123 @@
+<div class="container-fluid con">
+  <div class="row text-center">
+    <div class="col-12 col-md-2 col-xl3 mb-2">
+      <button mat-stroked-button class="bg-dark text-light" (click)="openModal(templateInsert)">
+        CREATE
+      </button>
+    </div>
+
+    <div class="col-12 col-md-9 col-xl-6 mb-2 mx-auto">
+      <div class="input-group mx-auto">
+        <input #searchInput type="text" class="form-control" placeholder="Enter project code or project description"
+               (keyup.enter)="searchProject(searchInput.value)">
+        <button class="btn btn-dark input-group-append" (click)="searchProject(searchInput.value)">SEARCH</button>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-1 col-xl-1">
+      <button mat-button (click)="clearSearch()">
+        <mat-icon>clear_all</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="row mt-5">
+    <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-5" *ngFor="let project of projects">
+      <div class="card shadow-sm">
+        <div class="card-header text-center">
+          <div class="card-title text-muted text-uppercase font-weight-bolder">
+            {{project.description}} [{{project.code}}]
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-text text-muted text-truncate mb-5">{{project.details}}</div>
+          <div class="row">
+            <div class="col-6">
+              <span class="badge badge-light float-left">PROJECT MANAGER</span>
+            </div>
+            <div class="col-6">
+              <span class="badge badge-light float-right">{{project.manager_name | titlecase}}</span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <span class="badge badge-light float-right">{{project.manager_email | lowercase}}</span>
+            </div>
+          </div>
+        </div>
+        <button mat-button [color]="project.active ? 'primary' : 'warn'" routerLink="{{project.id}}">DETAILS
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="projects?.length == 0">
+    <div class="card bg-warning text-center w-25">
+      <div class="card-body">
+        <div class="card-text font-weight-bolder">Project Not Found</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateInsert>
+  <div class="modal-header">
+    <h2 class="modal-title">Create Project</h2>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="projectForm" (ngSubmit)="createProject()">
+      <div class="form-group">
+        <label class="badge">PROJECT CODE</label>
+        <input type="text" formControlName="code" class="form-control"
+               [ngClass]="{ 'is-invalid': controls.code.errors && (controls.code.touched || controls.code.dirty) }"/>
+        <div *ngIf="controls.code.errors &&  (controls.code.touched || controls.code.dirty)"
+             class="invalid-feedback">
+          <div *ngIf="controls.code.errors.required">Project code is required field</div>
+          <div *ngIf="controls.code.errors.maxlength">Max 6 characters</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="badge">PROJECT DESCRIPTION</label>
+        <input type="text" formControlName="description" class="form-control"
+               [ngClass]="{ 'is-invalid': controls.description.errors && (controls.description.touched || controls.description.dirty) }"/>
+        <div *ngIf="controls.description.errors && (controls.description.touched || controls.description.dirty)"
+             class="invalid-feedback">
+          <div *ngIf="controls.description.errors.required">Project name is required field</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="badge">PROJECT DETAILS</label>
+        <textarea formControlName="details" class="form-control" aria-multiline="true" rows="7"
+                  [ngClass]="{ 'is-invalid': controls.details.errors && (controls.details.touched || controls.details.dirty) }"></textarea>
+        <div *ngIf="controls.details.errors && (controls.details.touched || controls.details.dirty)"
+             class="invalid-feedback">
+          <div *ngIf="controls.details.errors.required">Project details is required field</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="badge">PROJECT MANAGER</label>
+        <select formControlName="manager_id" class="form-control"
+                [ngClass]="{'is-invalid': controls.manager_id.errors && (controls.manager_id.touched || controls.manager_id.dirty)}">
+          <option [value]="null" [disabled]="true" [hidden]="true">Select Project Manager</option>
+          <option *ngFor="let manager of managerOptions" [ngValue]="manager.id">{{manager.name | titlecase}}
+            - {{manager.email | lowercase}}</option>
+        </select>
+        <div *ngIf="controls.manager_id.errors && (controls.manager_id.touched || controls.manager_id.dirty)"
+             class="invalid-feedback">
+          <div *ngIf="controls.manager_id.errors.required">Project manager is required field</div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">CANCEL</button>
+        <button type="submit" class="btn btn-danger" [disabled]="!projectForm.valid">SAVE</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+

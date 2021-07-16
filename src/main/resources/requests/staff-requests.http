@@ -1,0 +1,16 @@
+### USERS
+GET http://localhost:8080/api/staff
+
+### USER BY ID
+GET http://localhost:8080/api/staff/1
+
+### CREATE USER
+POST http://localhost:8080/api/staff
+Content-Type: application/json
+
+{
+
+  "username": "akaya",
+  "email": "akaya@kaya.com",
+  "password": "a123"
+}

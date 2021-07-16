@@ -1,0 +1,93 @@
+<div class="container w-50">
+  <form [formGroup]="staffForm" (ngSubmit)="updateStaff()">
+    <div class="form-group">
+      <label class="badge">NAME</label>
+      <input type="text" formControlName="name" class="form-control"
+             [ngClass]="{ 'is-invalid': controls.name.errors && (controls.name.touched || controls.name.dirty) }">
+      <div *ngIf="controls.name.errors &&  (controls.name.touched || controls.name.dirty)"
+           class="invalid-feedback">
+        <div *ngIf="controls.name.errors.required">Name is required field</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="badge">EMAIL</label>
+      <input type="text" formControlName="email" class="form-control"
+             [ngClass]="{ 'is-invalid': controls.email.errors && (controls.email.touched || controls.email.dirty) }">
+      <div *ngIf="controls.email.errors &&  (controls.email.touched || controls.email.dirty)"
+           class="invalid-feedback">
+        <div *ngIf="controls.email.errors.required">Email is required field</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="badge">POSITION</label>
+      <select formControlName="position" class="form-control"
+              [ngClass]="{ 'is-invalid': controls.position.errors && (controls.position.touched || controls.position.dirty) }">
+        <option *ngFor="let position of positionList"
+                [ngValue]="position.value">{{position.description}}</option>
+      </select>
+      <div *ngIf="controls.position.errors &&  (controls.position.touched || controls.position.dirty)"
+           class="invalid-feedback">
+        <div *ngIf="controls.position.errors.required">Position is required field</div>
+      </div>
+    </div>
+
+    <div>
+      <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+      <button mat-raised-button type="button" color="warn" (click)="showConfirmDialog()">DELETE</button>
+      <button mat-raised-button *ngIf="updateMode" type="submit" color="warn" class="ml-2 float-right"
+              [disabled]="!staffForm.valid || !staffForm.touched">SAVE
+      </button>
+      <button mat-raised-button type="button" class="ml-2 float-right"
+              (click)="changeEditMode()">{{updateMode == false ? 'EDIT' : 'CANCEL'}}</button>
+      <button mat-raised-button *ngIf="updateMode && staffForm.touched" type="button" color="primary"
+              class="btn float-right" (click)="setForm(staff)">DEFAULT
+      </button>
+    </div>
+  </form>
+</div>
+
+<div class="container-fluid mt-5">
+  <ngx-datatable class="bootstrap shadow-sm"
+                 [rows]="issueList"
+                 [columnMode]="columnMode.flex"
+                 [rowHeight]="'auto'"
+                 [headerHeight]="50"
+                 [footerHeight]="50"
+                 [externalPaging]="true"
+                 [count]="pageable.totalElements"
+                 [offset]="pageable.page"
+                 [limit]="pageable.size"
+                 (page)="getIssueList($event)">
+    <ngx-datatable-column prop="code" name="CODE" [cellTemplate]="templateCode" [flexGrow]="1"></ngx-datatable-column>
+    <ngx-datatable-column prop="description" name="DESCRIPTION" [flexGrow]="2"></ngx-datatable-column>
+    <ngx-datatable-column prop="details" name="DETAILS" [flexGrow]="3"></ngx-datatable-column>
+    <ngx-datatable-column prop="status" name="STATUS" [cellTemplate]="templateStatus"
+                          [flexGrow]="1"></ngx-datatable-column>
+    <ngx-datatable-column prop="due_date" name="DATE" [cellTemplate]="templateDate"
+                          [flexGrow]="1"></ngx-datatable-column>
+    <ngx-datatable-column prop="id" name="DETAIL" [cellTemplate]="templateAction"
+                          [flexGrow]="1" [frozenRight]="true"></ngx-datatable-column>
+  </ngx-datatable>
+
+  <ng-template #templateCode let-value="value">
+    <span class="badge">{{value}}</span>
+  </ng-template>
+
+  <ng-template #templateStatus let-value="value">
+    <span *ngIf="value === 'OPEN'" class="badge badge-pill badge-info">OPEN</span>
+    <span *ngIf="value === 'CLOSED'" class="badge badge-pill badge-danger">CLOSED</span>
+    <span *ngIf="value === 'IN_PROGRESS'" class="badge badge-pill badge-warning">IN_PROGRESS</span>
+    <span *ngIf="value === 'RESOLVED'" class="badge badge-pill badge-success">RESOLVED</span>
+  </ng-template>
+
+  <ng-template #templateDate let-value="value">
+    {{value | date: 'dd.MM.YYYY'}}
+  </ng-template>
+
+  <ng-template #templateAction let-value="value">
+    <button mat-stroked-button type="button" [routerLink]="['/issues', value]">Detail</button>
+  </ng-template>
+</div>
+

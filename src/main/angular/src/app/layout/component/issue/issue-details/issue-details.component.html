@@ -1,0 +1,131 @@
+<div class="container">
+  <div class="card card-body">
+    <form [formGroup]="issueForm" (ngSubmit)="updateIssue()">
+      <div class="row">
+        <div class="form-group col-2">
+          <label class="badge" [ngClass]="getColorClass()">ISSUE CODE</label>
+          <input type="text" formControlName="code" class="form-control"/>
+        </div>
+
+        <div class="form-group col-6">
+          <label class="badge" [ngClass]="getColorClass()">ISSUE DESCRIPTION</label>
+          <input type="text" formControlName="description" class="form-control"
+                 [ngClass]="{ 'is-invalid': controls.description.errors && (controls.description.touched || controls.description.dirty) }"/>
+          <div *ngIf="controls.description.errors && (controls.description.touched || controls.description.dirty)"
+               class="invalid-feedback">
+            <div *ngIf="controls.description.errors.required">Issue description is required field</div>
+          </div>
+        </div>
+
+        <div class="form-group col-4">
+          <label class="badge" [ngClass]="getColorClass()">ISSUE STATUS</label>
+          <select formControlName="status" class="form-control"
+                  [ngClass]="{ 'is-invalid': controls.status.errors && (controls.status.touched || controls.status.dirty) }">
+            <option *ngFor="let status of issueStatusList"
+                    [ngValue]="status.value">{{status.description}}</option>
+          </select>
+          <div *ngIf="controls.status.errors &&  (controls.status.touched || controls.status.dirty)"
+               class="invalid-feedback">
+            <div *ngIf="controls.active.errors.required">Issue status is required field</div>
+          </div>
+        </div>
+
+        <div class="form-group col-3">
+          <label class="badge" [ngClass]="getColorClass()">DUE DATE</label>
+          <input type="date" formControlName="due_date" class="form-control"
+                 [ngClass]="{ 'is-invalid': controls.due_date.errors && (controls.due_date.touched || controls.due_date.dirty) }">
+          <div *ngIf="controls.due_date.errors && (controls.due_date.touched || controls.due_date.dirty)"
+               class="invalid-feedback">
+            <div *ngIf="controls.due_date.errors.required">Date is required field</div>
+          </div>
+        </div>
+
+        <div class="form-group col-5">
+          <label class="badge" [ngClass]="getColorClass()">ASSIGNEE</label>
+          <select formControlName="assignee_id" class="form-control"
+                  [ngClass]="{'is-invalid': controls.assignee_id.errors && (controls.assignee_id.touched || controls.assignee_id.dirty)}">
+            <option *ngIf="issue.assignee_id" [ngValue]="issue.assignee_id">{{issue.assignee_name | titlecase}}
+              - {{issue.assignee_email | lowercase}}</option>
+            <option *ngFor="let staff of staffOptions" [ngValue]="staff.id">{{staff.name | titlecase}}
+              - {{staff.email | lowercase}}</option>
+          </select>
+          <div *ngIf="controls.assignee_id.errors && (controls.assignee_id.touched || controls.assignee_id.dirty)"
+               class="invalid-feedback">
+            <div *ngIf="controls.assignee_id.errors.required">Assignee is required field</div>
+          </div>
+        </div>
+
+        <div class="form-group col-12">
+          <label class="badge" [ngClass]="getColorClass()">ISSUE DETAILS</label>
+          <textarea formControlName="details" class="form-control" aria-multiline="true"
+                    [ngClass]="{ 'is-invalid': controls.details.errors && (controls.details.touched || controls.details.dirty) }"></textarea>
+          <div *ngIf="controls.details.errors && (controls.details.touched || controls.details.dirty)"
+               class="invalid-feedback">
+            <div *ngIf="controls.details.errors.required">Project details is required field</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer bg-white">
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+        <button mat-raised-button type="button" color="warn" (click)="showConfirmDialog()">DELETE</button>
+        <button mat-raised-button *ngIf="updateMode" type="submit" color="warn" class="ml-2 float-right"
+                [disabled]="!issueForm.valid || !issueForm.touched">SAVE
+        </button>
+        <button mat-raised-button type="button" class="ml-2 float-right"
+                (click)="changeEditMode()">{{updateMode == false ? 'EDIT' : 'CANCEL'}}</button>
+        <button mat-raised-button *ngIf="updateMode && issueForm.touched" type="button" color="primary"
+                class="btn float-right" (click)="setForm(issue)">DEFAULT
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="container-fluid mt-5">
+  <ngx-datatable class="bootstrap shadow-sm"
+                 [rows]="issueHistoryList"
+                 [columnMode]="columnMode.flex"
+                 [rowHeight]="'auto'"
+                 [headerHeight]="50"
+                 [footerHeight]="50"
+                 [externalPaging]="true"
+                 [count]="pageable.totalElements"
+                 [offset]="pageable.page"
+                 [limit]="pageable.size"
+                 (page)="getAllIssueHistoryByIssueId($event)">
+    <ngx-datatable-column prop="description" name="DESCRIPTION" [flexGrow]="2"></ngx-datatable-column>
+    <ngx-datatable-column prop="details" name="DETAILS" [flexGrow]="3"></ngx-datatable-column>
+    <ngx-datatable-column prop="status" name="STATUS" [cellTemplate]="templateStatus"
+                          [flexGrow]="1"></ngx-datatable-column>
+    <ngx-datatable-column prop="due_date" name="DATE" [cellTemplate]="templateDate"
+                          [flexGrow]="1"></ngx-datatable-column>
+    <ngx-datatable-column prop="assignee_name" name="ASSIGNEE" [cellTemplate]="templateTitleCase" [flexGrow]="1.5"
+                          [frozenRight]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="assignee_email" name="EMAIL" [cellTemplate]="templateEmail" [flexGrow]="1.5"
+                          [frozenRight]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="updated_time" name="UPDATED TIME" [cellTemplate]="templateDate"
+                          [flexGrow]="1" [frozenRight]="true"></ngx-datatable-column>
+  </ngx-datatable>
+
+  <ng-template #templateStatus let-value="value">
+    <span *ngIf="value === 'OPEN'" class="badge badge-pill badge-info">OPEN</span>
+    <span *ngIf="value === 'CLOSED'" class="badge badge-pill badge-danger">CLOSED</span>
+    <span *ngIf="value === 'IN_PROGRESS'" class="badge badge-pill badge-warning">IN_PROGRESS</span>
+    <span *ngIf="value === 'RESOLVED'" class="badge badge-pill badge-success">RESOLVED</span>
+  </ng-template>
+
+  <ng-template #templateDate let-value="value">
+    {{value | date: 'dd.MM.YYYY'}}
+  </ng-template>
+
+  <ng-template #templateTitleCase let-value="value">
+    <span>{{value | titlecase}}</span>
+  </ng-template>
+
+  <ng-template #templateEmail let-value="value">
+    <a *ngIf="value" class="text-primary" href="mailto: {{value}}"><{{value | lowercase}}></a>
+  </ng-template>
+</div>
+
+

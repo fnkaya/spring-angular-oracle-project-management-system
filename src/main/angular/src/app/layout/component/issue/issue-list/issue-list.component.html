@@ -1,0 +1,80 @@
+<div class="container-fluid">
+  <div class="mb-3 row">
+    <div class="col-1">
+      <button mat-button (click)="clearSearch()">
+        <mat-icon>clear_all</mat-icon>
+      </button>
+    </div>
+
+    <div class="col-2">
+      <form [formGroup]="issueStatusForm">
+        <select formControlName="value"  class="form-control" (change)="navigateUrlForFilter()">
+          <option [value]="null" [disabled]="true" [hidden]="true">Filter By Status</option>
+          <option *ngFor="let status of issueStatusList" [ngValue]="status['value']">{{status['description']}}</option>
+        </select>
+      </form>
+    </div>
+
+    <div class="input-group col-4">
+      <input #searchInput type="text" class="form-control" placeholder="Enter issue code, issue description or assignee name"
+             (keyup.enter)="navigateUrlForSearch(searchInput.value)">
+      <div class="input-group-append">
+        <button class="btn btn-dark" (click)="navigateUrlForSearch(searchInput.value)">SEARCH</button>
+      </div>
+    </div>
+  </div>
+
+  <ngx-datatable class="bootstrap shadow-sm"
+                 [rows]="issueList"
+                 [columnMode]="columnMode.flex"
+                 [rowHeight]="'auto'"
+                 [headerHeight]="50"
+                 [footerHeight]="50"
+                 [externalPaging]="true"
+                 [count]="pageable.totalElements"
+                 [offset]="pageable.page"
+                 [limit]="pageable.size"
+                 (page)="setPage($event)">
+    <ngx-datatable-column prop="code" name="CODE" [cellTemplate]="templateCode" [flexGrow]="1" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="description" name="DESCRIPTION" [cellTemplate]="templateCapitalize" [flexGrow]="2" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="details" name="DETAILS" [flexGrow]="3" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="status" name="STATUS" [cellTemplate]="templateStatus"
+                          [flexGrow]="1" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="due_date" name="DATE" [cellTemplate]="templateDate"
+                          [flexGrow]="1" [frozenLeft]="true"></ngx-datatable-column>
+    <ngx-datatable-column prop="assignee_name" name="ASSIGNEE" [cellTemplate]="templateCapitalize" [flexGrow]="2"></ngx-datatable-column>
+    <ngx-datatable-column prop="assignee_email" name="EMAIL" [cellTemplate]="templateEmail" [flexGrow]="2"></ngx-datatable-column>
+    <ngx-datatable-column prop="id" name="DETAIL" [cellTemplate]="templateAction"
+                          [flexGrow]="1"></ngx-datatable-column>
+  </ngx-datatable>
+
+  <ng-template #templateCode let-value="value">
+    <span class="badge">{{value}}</span>
+  </ng-template>
+
+  <ng-template #templateStatus let-value="value">
+    <span *ngIf="value === 'OPEN'" class="badge badge-pill badge-info">OPEN</span>
+    <span *ngIf="value === 'CLOSED'" class="badge badge-pill badge-danger">CLOSED</span>
+    <span *ngIf="value === 'IN_PROGRESS'" class="badge badge-pill badge-warning">IN_PROGRESS</span>
+    <span *ngIf="value === 'RESOLVED'" class="badge badge-pill badge-success">RESOLVED</span>
+  </ng-template>
+
+  <ng-template #templateDate let-value="value">
+    {{value | date: 'dd.MM.YYYY'}}
+  </ng-template>
+
+  <ng-template #templateCapitalize let-value="value">
+    <span *ngIf="value">{{value | titlecase}}</span>
+    <span *ngIf="!value">---</span>
+    <!--<button mat-stroked-button *ngIf="!value" color="primary" type="button">Assign</button>-->
+  </ng-template>
+
+  <ng-template #templateEmail let-value="value" >
+    <a *ngIf="value" role="button" class="text-primary" href="mailto: {{value}}"><{{value | lowercase}}></a>
+    <span *ngIf="!value">---</span>
+  </ng-template>
+
+  <ng-template #templateAction let-value="value">
+    <button mat-stroked-button type="button" [routerLink]="value">Detail</button>
+  </ng-template>
+</div>

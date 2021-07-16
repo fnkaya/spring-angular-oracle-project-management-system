@@ -1,0 +1,66 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer class="sidenav" fixedInViewport
+               [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+               [mode]="(isHandset$ | async) ? 'over' : 'side'"
+               [opened]="(isHandset$ | async) === false">
+    <mat-toolbar>Menu</mat-toolbar>
+    <mat-nav-list>
+      <mat-list-item routerLink="dashboard" routerLinkActive="bg-dark text-light">
+        <mat-icon class="mr-2">dashboard</mat-icon>
+        <span>Dashboard</span>
+      </mat-list-item>
+      <mat-list-item routerLink="projects" routerLinkActive="bg-dark text-light">
+        <mat-icon class="mr-2">work</mat-icon>
+        <span>Project</span>
+      </mat-list-item>
+      <mat-list-item routerLink="issues" routerLinkActive="bg-dark text-light">
+        <mat-icon class="mr-2">receipt_long</mat-icon>
+        <span>Issue</span>
+      </mat-list-item>
+      <mat-list-item routerLink="staff" routerLinkActive="bg-dark text-light">
+        <mat-icon  class="mr-2">portrait</mat-icon>
+        <span>Staff</span>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <button
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+        *ngIf="isHandset$ | async">
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <span class="header-title">PROJECT MANAGEMENT</span>
+      <div class="mx-auto"></div>
+
+      <div>
+        <button mat-button [matMenuTriggerFor]="menu"><mat-icon>widgets</mat-icon></button>
+        <mat-menu #menu="matMenu">
+          <div mat-menu-item routerLink="/profile"><mat-icon color="primary">account_circle</mat-icon>Profile</div>
+          <div mat-menu-item (click)="logout()"><mat-icon color="warn">exit_to_app</mat-icon>Logout</div>
+        </mat-menu>
+      </div>
+    </mat-toolbar>
+
+    <breadcrumb #parent>
+      <ol class="breadcrumb m-2">
+        <ng-template ngFor let-route [ngForOf]="parent.breadcrumbs">
+          <li *ngIf="!route.terminal" class="breadcrumb-item font-weight-bolder">
+            <a [routerLink]="[route.url]">{{ route.displayName }}</a>
+          </li>
+          <li *ngIf="route.terminal" class="breadcrumb-item font-weight-bolder active">
+            {{ route.displayName }}
+          </li>
+        </ng-template>
+      </ol>
+    </breadcrumb>
+
+    <div class="p-4">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
