@@ -1,7 +1,5 @@
 # PmWebUi
 
-<a href="https://github.com/fnkaya/spring-boot-project-management">Backend >>></a>
-
 ##### Projects
 <img src="images/db1.png" />
 <br/>
